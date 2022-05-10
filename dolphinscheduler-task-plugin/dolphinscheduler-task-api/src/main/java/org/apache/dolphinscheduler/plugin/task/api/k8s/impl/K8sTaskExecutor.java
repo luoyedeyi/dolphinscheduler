@@ -106,7 +106,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 envVars.add(envVar);
             }
         }
-        Job k8sJob = new JobBuilder()
+        return new JobBuilder()
             .withApiVersion(API_VERSION)
             .withNewMetadata()
             .withName(k8sJobName)
@@ -130,7 +130,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             .withBackoffLimit(retryNum)
             .endSpec()
             .build();
-        return k8sJob;
     }
 
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse, K8sTaskMainParameters k8STaskMainParameters) {
@@ -203,6 +202,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             submitJob2k8s(k8sParameterStr);
             registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result, k8STaskMainParameters);
         } catch (Exception e) {
+            cancelApplication(k8sParameterStr);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         }
@@ -249,7 +249,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    private int getK8sJobStatus(Job job) {
+    public int getK8sJobStatus(Job job) {
         JobStatus jobStatus = job.getStatus();
         if (jobStatus.getSucceeded() != null && jobStatus.getSucceeded() == 1) {
             return EXIT_CODE_SUCCESS;
@@ -260,7 +260,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    private void setTaskStatus(int jobStatus,String taskInstanceId, TaskResponse taskResponse, K8sTaskMainParameters k8STaskMainParameters) {
+    public void setTaskStatus(int jobStatus,String taskInstanceId, TaskResponse taskResponse, K8sTaskMainParameters k8STaskMainParameters) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
             if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
                 logStringBuffer.append(String.format("[K8sJobExecutor-%s] killed", job.getMetadata().getName()));
@@ -274,5 +274,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
             }
         }
+    }
+
+    public Job getJob() {
+        return job;
+    }
+
+    public void setJob(Job job) {
+        this.job = job;
     }
 }
