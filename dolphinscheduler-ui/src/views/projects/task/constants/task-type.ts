@@ -34,6 +34,7 @@ export type TaskType =
   | 'SEATUNNEL'
   | 'EMR'
   | 'ZEPPELIN'
+  | 'K8S'
 
 export const TASK_TYPES_MAP = {
   SHELL: {
@@ -97,6 +98,10 @@ export const TASK_TYPES_MAP = {
   },
   ZEPPELIN: {
     alias: 'ZEPPELIN',
+    helperLinkDisable: true
+  },
+  K8S: {
+    alias: 'K8S',
     helperLinkDisable: true
   }
 } as { [key in TaskType]: { alias: string; helperLinkDisable?: boolean } }
