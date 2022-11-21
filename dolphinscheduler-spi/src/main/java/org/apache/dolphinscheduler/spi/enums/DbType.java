@@ -43,7 +43,8 @@ public enum DbType {
     TRINO(12, "trino"),
     STARROCKS(13, "starrocks"),
     AZURESQL(14, "azuresql"),
-    DAMENG(15, "dameng");
+    DAMENG(15, "dameng"),
+    KYUUBI(18, "kyuubi");
 
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
